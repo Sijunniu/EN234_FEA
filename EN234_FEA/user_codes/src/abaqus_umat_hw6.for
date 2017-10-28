@@ -1,17 +1,17 @@
 !
-!    ABAQUS format user material subroutine for explicit dynamics
+!    ABAQUS format user material subroutine for small strain hypoelastic material
 !
 !
 
-      SUBROUTINE UMAT_e(STRESS,STATEV,DDSDDE,SSE,SPD,SCD,
+      SUBROUTINE UMAT(STRESS,STATEV,DDSDDE,SSE,SPD,SCD,
      1 RPL,DDSDDT,DRPLDE,DRPLDT,
      2 STRAN,DSTRAN,TIME,DTIME,TEMP,DTEMP,PREDEF,DPRED,CMNAME,
      3 NDI,NSHR,NTENS,NSTATV,PROPS,NPROPS,COORDS,DROT,PNEWDT,
      4 CELENT,DFGRD0,DFGRD1,NOEL,NPT,LAYER,KSPT,KSTEP,KINC)
 !
-!      INCLUDE 'ABA_PARAM.INC'
+      INCLUDE 'ABA_PARAM.INC'
 !     WARNING - the aba_param.inc file declares
-        Implicit double precision (a-h,o-z)
+!        Implicit double precision (a-h,o-z)
 !     This means that, by default, any variables with
 !     first letter between a-h or o-z are double precision.
 !     The rest are integers.
@@ -41,7 +41,7 @@
 !         for the user-defined material, ABAQUS/Standard will use only
 !         the symmetric part of DDSDDE. The symmetric part of the matrix
 !         is calculated by taking one half the sum of the matrix and its transpose.
-
+!         EN234FEA always uses the full matrix (no symmetry is assumed)
 
 !      STRESS(NTENS)
 !         This array is passed in as the stress tensor at the beginning
@@ -240,7 +240,7 @@
 !      KSPT
 !          Section point number within the current layer.
 !
-!      KSTEP
+!      KSTEP 
 !         Step number.
 !
 !     KINC
@@ -251,60 +251,40 @@
 !
 !     Local variables
 
-      double precision E,xnu
-      integer i,j
+      double precision :: edev(6)
+      double precision :: evol
+      double precision :: G,nu,e0,pt
+      double precision :: kappa
+      double precision :: Kb
+      integer :: j
 
-      ddsdde = 0.d0
+       G = PROPS(1)
+       nu = PROPS(2)
+       e0 = PROPS(3)
+       pt = PROPS(4)
+       
+       evol = sum(STRAN(1:3)+DSTRAN(1:3))
+       edev(1:3) = STRAN(1:3)+DSTRAN(1:3) - evol/3.d0
+       edev(4:6) = 0.5d0*(STRAN(4:6)+DSTRAN(4:6))
+       
+       kappa=pt*(1-2*nu)*(1+e0)/(1+nu)
+       Kb=pt*(1+e0)/(3*kappa)*exp(-(1+e0)*evol/kappa)-2*G/3
+       
+       DDSDDE(1:6,1:6) = 0.d0
+       forall(j=1:3) DDSDDE(j,j) = G*2.d0
+       forall(j=4:6) DDSDDE(j,j) = G
+       DDSDDE(1:3,1:3) = DDSDDE(1:3,1:3) + Kb
+       stress = 2*G*edev
+       stress(1:3) = stress(1:3) + pt*(1-exp(-(1+e0)*evol/kappa))/3
+       
+!       open (10, file='stress.txt', status='unknown')
+!       write(10,*) 'stress = ' ,stress(1)
 
-      E = props(1)
-      xnu = props(2)
+!       open (10, file='strain.txt', status='unknown')
+!       write(10,*) 'strain = ' ,STRAN(1)
 
-!    for debugging, you can use
-!      write(6,*) ' Hello '
-!    Output is then written to the .dat file 
+       return
 
-      If (ndi==3 .and. nshr==1) then    ! Plane strain or axisymmetry
-         ddsdde(1,1) = 1.d0-xnu
-         ddsdde(1,2) = xnu
-         ddsdde(1,3) = xnu
-         ddsdde(2,1) = xnu
-         ddsdde(2,2) = 1.d0-xnu
-         ddsdde(2,3) = xnu
-         ddsdde(3,1) = xnu
-         ddsdde(3,2) = xnu
-         ddsdde(3,3) = 1.d0-xnu
-         ddsdde(4,4) = 0.5d0*(1.d0-2.d0*xnu)
-         ddsdde = ddsdde*E/( (1.d0+xnu)*(1.d0-2.d0*xnu) )
-      else if (ndi==2 .and. nshr==1) then   ! Plane stress
-         ddsdde(1,1) = 1.d0
-         ddsdde(1,2) = xnu
-         ddsdde(2,1) = xnu
-         ddsdde(2,2) = 1.d0
-         ddsdde(3,3) = 0.5d0*(1.d0-xnu)
-         ddsdde = ddsdde*E/( (1.d0+xnu*xnu) )
-      else ! 3D
-         ddsdde(1,1) = 1.d0-xnu
-         ddsdde(1,2) = xnu
-         ddsdde(1,3) = xnu
-         ddsdde(2,1) = xnu
-         ddsdde(2,2) = 1.d0-xnu
-         ddsdde(2,3) = xnu
-         ddsdde(3,1) = xnu
-         ddsdde(3,2) = xnu
-         ddsdde(3,3) = 1.d0-xnu
-         ddsdde(4,4) = 0.5d0*(1.d0-2.d0*xnu)
-         ddsdde(5,5) = ddsdde(4,4)
-         ddsdde(6,6) = ddsdde(4,4)
-         ddsdde = ddsdde*E/( (1.d0+xnu)*(1.d0-2.d0*xnu) )
-      endif
-!
-!     NOTE: ABAQUS uses engineering shear strains,
-!     i.e. stran(ndi+1) = 2*e_12, etc...
-      do i = 1,ntens
-      do j = 1,ntens
-         stress(i) = stress(i) + ddsdde(i,j)*dstran(j)
-      end do
-      end do
 
       RETURN
-      END subroutine UMAT_e
+      END SUBROUTINE UMAT
