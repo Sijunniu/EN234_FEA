@@ -163,10 +163,10 @@
            Gaa = 1.0000001*deplas/Omega
            
            C = 1 - exp(-((dt/Ga+(1.d0/Ga+1)*
-     &        exp(Ga)*ta)/(1+1.d0/Ga*exp(Ga))/td)**alpha)
+     &        exp(-Ga)*ta)/(1+1.d0/Ga*exp(-Ga))/td)**alpha)
            
            CC = 1 - exp(-((dt/Gaa+(1.d0/Gaa+1)*
-     &        exp(Gaa)*ta)/(1+1.d0/Gaa*exp(Gaa))/td)**alpha)
+     &        exp(-Gaa)*ta)/(1+1.d0/Gaa*exp(-Gaa))/td)**alpha)
            
            b = Y/S*(1+(eplas+deplas)/e0)**m + H*C+dlog(deplas/dt/edot0)
            
