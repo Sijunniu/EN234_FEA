@@ -41,8 +41,7 @@
       ELEMENTS, USER
         PARAMETERS, 8, 48, U1   % The Un activates the ABAQUS UEL
         PROPERTIES
-          0.5d0, 500.d0  % Props are mu,K
-          2.d0,2.d0,2.d0,1.d0      % G11, G22, G33, G44
+          1.d0, 200.d0  % Props are mu,K
         END PROPERTIES
 
 %     Define element connectivity
@@ -72,7 +71,7 @@
 %       SUBROUTINE PARAMETERS defines a list of parameters passed to user-subroutines generating DOFs
         SUBROUTINE PARAMETERS, stretch-rotation
            1      % stretch direction
-           1.50d0   % Change in length
+           1.d0   % Change in length
            10     % No. extension steps
            90.d0  % Rotation angle (degrees)
            3      % Rotation axis (1,2,or 3)
@@ -129,7 +128,6 @@
 %   the residual force vector is consistent with the stiffness
      CHECK STIFFNESS, U1
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Analysis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
    %   The STATIC STEP key initializes a static load step
@@ -155,7 +153,7 @@
 %                        UNSYMMETRIC  (optional - only for unsymmetric stiffness)
 
 
-         SOLVER, DIRECT, NONLINEAR, 1.d-05,15, UNSYMMETRIC
+         SOLVER, DIRECT, NONLINEAR, 1.d-08,15, UNSYMMETRIC
 
 
 %      This prints the DOF values and projected nodal state for all solid elements to a tecplot readable file

@@ -4136,7 +4136,7 @@ END NODES
 %       Define element properties - the values are passed to user subroutine elstif in the order they are listed here
 %       For the example provided, the params are Youngs Modulus, Poissons ratio 
         PROPERTIES
-         100.d0, 0.3d0
+         1.d0, 200.d0
         END PROPERTIES
 %     Define element connectivity
 %     The element number (first number in the list) is optional, and is ignored in the code
@@ -7229,12 +7229,12 @@ END MESH
 %       The HISTORY key defines a time history that can be applied to DOFs or distributed loads
         HISTORY, dof_history
           0.d0, 0.d0
-         10.d0, 0.1d0
+         10.d0, 1.d0
         END HISTORY
 
         HISTORY, dload_history
           0.d0, 2.d0
-         10.d0, 2.d0
+         30.d0, 2.d0
         END HISTORY
 
 %       The NODESET key defines a list of nodes
@@ -7332,7 +7332,7 @@ END MESH
 
 %   The CHECK STIFFNESS key tests the element subroutine to ensure that
 %   the residual force vector is consistent with the stiffness
-%       CHECK STIFFNESS, 1001
+       CHECK STIFFNESS, U1
 
 %    STOP
 
@@ -7349,7 +7349,7 @@ END MESH
           INITIAL TIME STEP, 1.d0
           MAX TIME STEP, 1.d0
           MIN TIME STEP, 0.001d0
-          MAX NUMBER OF STEPS, 3
+          MAX NUMBER OF STEPS, 10
           STOP TIME, 10.d0
           STATE PRINT STEP INTERVAL, 1
     
@@ -7363,7 +7363,7 @@ END MESH
 %                        For nonlinear solver, must specify convergence tolerance and max # iterations
 %                        UNSYMMETRIC  (optional - only for unsymmetric stiffness)
 
-         SOLVER, DIRECT, LINEAR
+         SOLVER, DIRECT, NONLINEAR, 1.d-05,15, UNSYMMETRIC
 
          PRINT STATE, Output_files\contourplots.dat
 %            DEGREES OF FREEDOM   % Uncomment this to print the displacements

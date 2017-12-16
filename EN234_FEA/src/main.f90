@@ -47,8 +47,8 @@ program en234fea
 !   Runs an explicit dynamic simulation of a 3D plate with a central hole with and ABAQUS VUEL
 !   This simulation will take a few minutes to run (running in release mode will speed it up)
 !
-!   infil = 'input_files/Abaqus_uel_holeplate_3d.in'
-!   outfil = 'output_files/Abaqus_uel_holeplate_3d.out'
+   infil = 'input_files/Abaqus_uel_holeplate_3d.in'
+   outfil = 'output_files/Abaqus_uel_holeplate_3d.out'
    
 !  Tests an ABAQUS format UMAT subroutine (in abaqus_umat_elastic.for) with two 8 noded quadrilateral elements
 !   infil = 'input_files/Abaqus_umat_linear_elastic_3d.in'
@@ -121,9 +121,14 @@ program en234fea
 
 
 !   Homework 10 - Continuum beam element solution to end loaded cantilever beam
-   infil = 'input_files/Abaqus_uel_continuum_beam.in'
-   outfil = 'Output_files/Abaqus_uel_continuum_beam.out'
+!   infil = 'input_files/Abaqus_uel_continuum_beam.in'
+!   outfil = 'Output_files/Abaqus_uel_continuum_beam.out'
 
+   
+!   Final project test input file
+!   infil = 'input_files/Abaqus_uel_projecttest.in'
+!   outfil = 'Output_files/Abaqus_uel_projecttest.out'
+   
    infil = trim(root_directory)//trim(infil)
    outfil = trim(root_directory)//trim(outfil)
    open (unit = IOR, file = trim(infil), status = 'old', ERR=500)
